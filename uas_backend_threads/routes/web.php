@@ -14,3 +14,4 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::get('/threads', [ThreadController::class, 'index'])->name('threads.index');
 Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
+Route::get('/threads/{id}', [ThreadController::class, 'show'])->name('threads.show');
