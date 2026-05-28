@@ -5,6 +5,7 @@ use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ReplyController;
 use App\Models\Reply;
+use App\Http\Controllers\ActivityController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,3 +24,4 @@ Route::get('/thread/demo', function () {
     return view('replies.thread-detail', compact('replies'));
 });
 Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
+Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
