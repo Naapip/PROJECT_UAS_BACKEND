@@ -17,7 +17,13 @@
                     <input type="text" name="query" placeholder="Search..." value="{{ request('query') }}">
                     <button type="submit">Search</button>
                 </form>
-
+                @if($errors->any())
+                  <div style="color: red; margin-top: 10px;">
+                      @foreach($errors->all() as $error)
+                        <small>⚠️ {{ $error }}</small>
+                      @endforeach
+                  </div>  
+                @endif
                 <hr>
 
                 <h3>Users Results</h3>
@@ -54,6 +60,8 @@
                                     <br><br>
                                     <strong>{{ $thread->user->name ?? 'Anonymous' }}</strong>
                                     <p>{{ $thread->content }}</p>
+                                    
+                                    <small>💬 {{ $thread->replies_count ?? 0 }} Balasan</small>
                                 </td>
                             </tr>
                         </table>
