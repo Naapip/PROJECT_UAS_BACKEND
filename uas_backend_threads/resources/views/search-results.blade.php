@@ -38,7 +38,10 @@
                                     <br><br>
                                     <strong>{{ $user->name }}</strong>
                                     <p>Email: {{ $user->email }}</p>
-                                    <button type="button">[Follow]</button>
+                                    <form action="{{ route('follow.toggle', $user->id) }}" method="POST" style="display:inline">
+                                        @csrf
+                                        <button type="submit">[Follow]</button>
+                                    </form>
                                 </td>
                             </tr>
                         </table>
