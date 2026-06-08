@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ReplyController;
+use App\Http\Controllers\RelationshipController;
 use App\Models\Reply;
 
 Route::get('/', function () {
@@ -23,3 +24,7 @@ Route::get('/thread/demo', function () {
     return view('replies.thread-detail', compact('replies'));
 });
 Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
+
+Route::post('/follow/{id}', [RelationshipController::class, 'toggleFollow'])->name('follow.toggle');
+
+Route::get('/connections', [RelationshipController::class, 'index'])->name('connections');
