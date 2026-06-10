@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ReplyController;
+use App\Http\Controllers\ReplyEditController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\BookmarkController;
 use App\Models\Reply;
@@ -25,6 +26,10 @@ Route::get('/thread/demo', function () {
     return view('replies.thread-detail', compact('replies'));
 });
 Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
+// Rute untuk menampilkan halaman edit (GET)
+Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
+// Rute untuk memproses eksekusi update data ke database (PUT)
+Route::put('/reply/update/{id}', [ReplyEditController::class, 'update']);
 
 Route::post('/follow/{id}', [RelationshipController::class, 'toggleFollow'])->name('follow.toggle');
 
