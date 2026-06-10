@@ -8,13 +8,40 @@ use Illuminate\Support\Facades\Auth;
 
 class ActivityController extends Controller
 {
+    private function getUserId()
+    {
+        return Auth::id() ?? 1; 
+    }
+
     public function index()
     {
-        // Mengambil riwayat aktivitas pengguna yang sedang sesi, diurutkan dari yang terbaru
-        $activities = Activity::where('user_id', Auth::id())
+        $activities = Activity::where('user_id', $this->getUserId())
                               ->latest()
                               ->get();
 
+        // Mengarahkan ke file resources/views/activities/history-list.blade.php
         return view('activities.history-list', compact('activities'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'description' => 'required|string|max:255'
+        ]);
+
+        Activity::create([
+            'user_id' => $this->getUserId(),
+            'type' => 'manual_input',
+            'description' => $request->description,
+        ]);
+
+        return redirect('/activities')->with('success', 'Aktivitas berhasil dicatat!');
+    }
+
+    public function clear()
+    {
+        Activity::where('user_id', $this->getUserId())->delete();
+
+        return redirect('/activities')->with('success', 'Riwayat aktivitas berhasil dibersihkan!');
     }
 }

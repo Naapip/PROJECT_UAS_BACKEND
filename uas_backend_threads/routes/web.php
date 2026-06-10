@@ -24,4 +24,10 @@ Route::get('/thread/demo', function () {
     return view('replies.thread-detail', compact('replies'));
 });
 Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
-Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+
+
+Route::prefix('activities')->group(function () {
+    Route::get('/', [ActivityController::class, 'index']);
+    Route::post('/', [ActivityController::class, 'store']);
+    Route::delete('/clear', [ActivityController::class, 'clear']);
+});
