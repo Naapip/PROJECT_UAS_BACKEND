@@ -7,6 +7,7 @@ use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\BookmarkController;
 use App\Models\Reply;
+use App\Http\Controllers\ActivityController;
 
 Route::get('/', function () {
     return view('welcome');
