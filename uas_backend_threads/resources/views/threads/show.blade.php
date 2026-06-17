@@ -4,44 +4,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post Detail - bakwanrimac</title>
+    <title>Post Detail - {{ $thread->user->name }}</title>
 </head>
 
 <body>
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
 
-    <div>
-        <div>
+        <div style="margin-bottom: 20px;">
             <a href="{{ route('threads.index') }}">
                 <span>←</span> <span>Back to Threads</span>
             </a>
         </div>
 
-        <div>
-            <div>
-                <div>👤</div>
+        <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <div style="font-size: 24px;">👤</div>
                 <div>
-                    <h3>bakwanrimac</h3>
+                    <h3 style="margin: 0;">{{ $thread->user->name }}</h3>
+                    <small style="color: #555;"></small>
+
                     @if ($thread->community_or_topic)
-                        <p>{{ $thread->community_or_topic }}</p>
+                        <p style="margin: 5px 0 0 0; font-size: 14px; color: blue;">#{{ $thread->community_or_topic }}
+                        </p>
                     @endif
                 </div>
             </div>
 
-            <p>{{ $thread->content }}</p>
+            <p style="font-size: 18px; line-height: 1.5;">{{ $thread->content }}</p>
 
             @if ($thread->image_path)
-                <div>
-                    <img
+                <div style="margin-top: 15px; text-align: center;">
+                    <img style="max-width: 100%; border-radius: 8px;"
                         src="{{ str_starts_with($thread->image_path, 'http') ? $thread->image_path : asset($thread->image_path) }}">
                 </div>
             @endif
 
-            <div>
+            <div style="margin-top: 15px; color: #777; font-size: 12px;">
                 Posted on {{ $thread->created_at->format('d M Y, H:i') }}
             </div>
         </div>
-    </div>
 
+        <div style="margin-top: 30px;">
+            <h3>Replies</h3>
+            @if ($thread->replies && $thread->replies->count() > 0)
+                @foreach ($thread->replies as $reply)
+                    <div style="border-left: 2px solid #ccc; padding-left: 15px; margin-bottom: 15px;">
+                        <strong>{{ $reply->user->name }}</strong>
+                        <small style="color: #777;">@{{ $reply - > user - > username }}</small>
+                        <p style="margin: 5px 0;">{{ $reply->content }}</p>
+                    </div>
+                @endforeach
+            @else
+                <p style="color: #777; font-style: italic;">No replies yet.</p>
+            @endif
+        </div>
+
+    </div>
 </body>
 
 </html>

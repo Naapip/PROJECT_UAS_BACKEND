@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('bookmarks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('thread_id')->constrained('threads')->onDelete('cascade');
+
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('thread_id')->constrained()->onDelete('cascade');
+
             $table->timestamps();
         });
     }
