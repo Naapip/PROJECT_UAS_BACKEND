@@ -2,7 +2,9 @@
     @foreach($childReplies as $child)
         <li>
             <strong>@user_{{ $child->user_id }}:</strong> {{ $child->content }}
-            <br><a href="{{ route('reply.edit', $reply->id) }}" style="font-size: 12px; color: blue;">[Edit Komentar]</a>
+            
+            <br>
+            <a href="{{ route('reply.edit', $child->id) }}" style="font-size: 12px; color: blue;">[Edit Komentar]</a>
             
             <form action="{{ route('reply.store') }}" method="POST" style="margin-top: 5px; margin-bottom: 10px;">
                 @csrf
