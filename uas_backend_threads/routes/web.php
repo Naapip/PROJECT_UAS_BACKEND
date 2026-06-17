@@ -4,49 +4,58 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ReplyController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReplyEditController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\BookmarkController;
-use App\Models\Reply;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Models\Reply;
+
 
 Route::get('/', function () {
-    return view('welcome');
+    if (\Illuminate\Support\Facades\Auth::check()) { // 👈 Menggunakan Facade Auth resmi
+        return redirect()->route('threads.index');
+    }
+    return redirect()->route('login');
 });
 
-Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/threads', [ThreadController::class, 'index'])->name('threads.index');
-Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
-
-// Route simulasi halaman detail thread untuk demo progres Naufal
-Route::get('/thread/demo', function () {
-    $replies = Reply::where('thread_id', 1)
-        ->whereNull('parent_reply_id')
-        ->with('childReplies')
-        ->get();
-
-    return view('replies.thread-detail', compact('replies'));
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
 });
 
-Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
-// Rute untuk menampilkan halaman edit (GET)
-Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
-// Rute untuk memproses eksekusi update data ke database (PUT)
-Route::put('/reply/update/{id}', [ReplyEditController::class, 'update']);
+Route::middleware('auth')->group(function () {
 
-Route::post('/follow/{id}', [RelationshipController::class, 'toggleFollow'])->name('follow.toggle');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/connections', [RelationshipController::class, 'index'])->name('connections');
+    Route::get('/threads', [ThreadController::class, 'index'])->name('threads.index');
+    Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
+    Route::get('/threads/{id}', [ThreadController::class, 'show'])->name('threads.show');
 
+    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+    Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
 
-Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
-Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
+    Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
+    Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
+    Route::put('/reply/update/{id}', [ReplyEditController::class, 'update']);
 
+    Route::post('/follow/{id}', [RelationshipController::class, 'toggleFollow'])->name('follow.toggle');
+    Route::get('/connections', [RelationshipController::class, 'index'])->name('connections');
 
-Route::get('/users', [UserController::class, 'index']);
-Route::get('/users/{id}', [UserController::class, 'show']);
-Route::post('/users', [UserController::class, 'store']);
-Route::put('/users/{id}', [UserController::class, 'update']);
-Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+
+    Route::get('/thread/demo', function () {
+        $replies = Reply::where('thread_id', 1)
+            ->whereNull('parent_reply_id')
+            ->with('childReplies')
+            ->get();
+        return view('replies.thread-detail', compact('replies'));
+    });
+});

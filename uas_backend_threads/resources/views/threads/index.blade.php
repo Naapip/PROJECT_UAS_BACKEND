@@ -9,102 +9,122 @@
 </head>
 
 <body>
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; position: relative;">
 
-    <div>
-        <div>
-            <h1>Threads</h1>
-            <button id="openModalBtn">
-                + New Thread
-            </button>
+        <div
+            style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">
+            <div>
+                <h1 style="margin: 0;">Threads</h1>
+                <button id="openModalBtn" style="margin-top: 10px;">
+                    + New Thread
+                </button>
+            </div>
+
+            <div style="text-align: right;">
+                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit"
+                        style="cursor: pointer; color: red; background: none; border: 1px solid red; padding: 4px 8px; border-radius: 4px;">
+                        Logout
+                    </button>
+                </form>
+            </div>
         </div>
 
         <div>
             @foreach ($threads as $thread)
-                <a href="{{ route('threads.show', $thread->id) }}">
-                    <div>
-                        <span>bakwanrimac</span>
-                        @if ($thread->community_or_topic)
-                            <span>•</span>
-                            <span>{{ $thread->community_or_topic }}</span>
+                <div style="padding: 16px 0; border-bottom: 1px solid #efefef;">
+
+                    <a href="{{ route('threads.show', $thread->id) }}"
+                        style="text-decoration: none; color: inherit; display: block;">
+                        <div>
+                            <strong>{{ $thread->user->name }}</strong>
+                            <span style="color: #777;"></span>
+                            @if ($thread->community_or_topic)
+                                <span>•</span>
+                                <span style="color: blue;">{{ $thread->community_or_topic }}</span>
+                            @endif
+                        </div>
+
+                        <p style="margin: 8px 0;">{{ $thread->content }}</p>
+
+                        @if ($thread->image_path)
+                            <div style="margin-top: 10px; margin-bottom: 15px; display: inline-block; max-width: 100%;">
+                                <img src="{{ str_starts_with($thread->image_path, 'http') ? $thread->image_path : asset($thread->image_path) }}"
+                                    alt="Uploaded Image"
+                                    style="width: 400px; max-width: 100%; height: auto; max-height: 300px; object-fit: cover; display: block; border: 1px solid #ccc;">
+                            </div>
                         @endif
+                    </a>
+
+                    <div style="margin-top: 10px;">
+                        <button type="button" class="bookmark-btn" data-id="{{ $thread->id }}"
+                            style="cursor: pointer;">
+                            <span class="bookmark-icon">🔖</span> Save to Bookmark
+                        </button>
                     </div>
 
-                    <p>{{ $thread->content }}</p>
-
-                    @if ($thread->image_path)
-                        <div>
-                            <img
-                                src="{{ str_starts_with($thread->image_path, 'http') ? $thread->image_path : asset($thread->image_path) }}">
-                        </div>
-                    @endif
-                </a>
-
-                <div>
-                    <button type="button" class="bookmark-btn" data-id="{{ $thread->id }}">
-                        <span class="bookmark-icon">🔖</span> Save to Bookmark
-                    </button>
                 </div>
-                <hr>
             @endforeach
         </div>
     </div>
 
-    <div id="threadModal" style="display: none;">
-        <div>
-            <div>
+    <div id="threadModal"
+        style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center;">
+        <div
+            style="background-color: #ffffff; color: #000000; padding: 20px; width: 100%; max-width: 500px; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <button id="closeModalBtn">Cancel</button>
-                <h2>New thread</h2>
-                <div>
-                    <span>📄</span>
-                    <span>⋯</span>
-                </div>
+                <h2 style="margin: 0;">New thread</h2>
+                <div style="color: #999;">📄</div>
             </div>
 
             <form action="{{ route('threads.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div>
-                    <div>👤</div>
+                <div style="display: flex; gap: 12px; margin-bottom: 15px;">
+                    <div style="font-size: 24px;">👤</div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                        <input type="text" name="community_or_topic" placeholder="Community or topic (optional)"
+                            style="width: 100%; padding: 6px;">
+                        <textarea id="threadContent" name="content" rows="4" placeholder="What's new?" required
+                            style="width: 100%; padding: 6px; resize: none; font-family: inherit;"></textarea>
 
-                    <div>
-                        <div>
-                            <input type="text" name="community_or_topic" placeholder="Community or topic >">
-                        </div>
-
-                        <textarea id="threadContent" name="content" rows="3" placeholder="What's new?" required></textarea>
-
-                        <div id="imagePreviewContainer" style="display: none;">
-                            <img id="imagePreview" src="#">
+                        <div id="imagePreviewContainer"
+                            style="display: none; position: relative; margin-top: 10px; max-width: 100px;">
+                            <img id="imagePreview" src="#" style="max-width: 100%;">
                             <input type="hidden" id="gifUrlInput" name="gif_url">
-                            <button type="button" id="removeImageBtn">✕</button>
+                            <button type="button" id="removeImageBtn"
+                                style="position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; cursor: pointer;">✕</button>
                         </div>
 
-                        <input type="file" id="fileInput" name="image" accept="image/*" onchange="previewFile()">
+                        <input type="file" id="fileInput" name="image" accept="image/*" onchange="previewFile()"
+                            style="display: none;">
 
-                        <div>
+                        <div style="display: flex; gap: 10px; margin-top: 5px;">
                             <button type="button" onclick="document.getElementById('fileInput').click()"
-                                title="Attach Photo">🖼️</button>
-                            <button type="button" id="gifBtn" title="Choose GIF">👾</button>
-                            <button type="button" id="emojiBtn" title="Insert Emoji">😊</button>
+                                title="Attach Photo">🖼️ Photo</button>
+                            <button type="button" id="gifBtn" title="Choose GIF">👾 GIF</button>
+                            <button type="button" id="emojiBtn" title="Insert Emoji">😊 Emoji</button>
                         </div>
 
-                        <div id="gifPopup" style="display: none;">
-                            <input type="text" id="gifSearchInput" placeholder="Search 12+ local database GIFs...">
-                            <div id="gifGridContainer">
-                            </div>
+                        <div id="gifPopup"
+                            style="display: none; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 10px; margin-top: 5px; max-height: 200px; overflow-y: auto;">
+                            <input type="text" id="gifSearchInput" placeholder="Search local GIFs..."
+                                style="width: 100%; padding: 6px; margin-bottom: 8px; box-sizing: border-box;">
+                            <div id="gifGridContainer"
+                                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;"></div>
                         </div>
 
-                        <div id="emojiPopup" style="display: none;">
-                            <emoji-picker></emoji-picker>
+                        <div id="emojiPopup" style="display: none; margin-top: 5px;">
+                            <emoji-picker style="width: 100%; height: 250px;"></emoji-picker>
                         </div>
-
                     </div>
                 </div>
 
-                <div>
-                    <span>Post Options</span>
-                    <button type="submit">
-                        Post
-                    </button>
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 15px;">
+                    <span style="color: #999; font-size: 13px;">Anyone can reply</span>
+                    <button type="submit">Post</button>
                 </div>
             </form>
         </div>
@@ -130,7 +150,6 @@
         const emojiPopup = document.getElementById('emojiPopup');
         const picker = document.querySelector('emoji-picker');
 
-        // Database 12 URL GIF Statis
         const localGifs = [{
                 name: "cat laugh meme lucu kucing ketawa ngakak",
                 url: "https://media4.giphy.com/media/tJqyalvo9ahykfykAj/200.gif"
@@ -181,8 +200,7 @@
             }
         ];
 
-        // Manajemen Aksi Buka Tutup Modal Utama menggunakan Inline Style Element
-        openBtn.addEventListener('click', () => modal.style.display = 'block');
+        openBtn.addEventListener('click', () => modal.style.display = 'flex');
         closeBtn.addEventListener('click', () => {
             modal.style.display = 'none';
             gifPopup.style.display = 'none';
@@ -216,7 +234,8 @@
             const matchedGifs = localGifs.filter(item => item.name.includes(query));
 
             if (matchedGifs.length === 0) {
-                gifGridContainer.innerHTML = '<div>No GIFs found.</div>';
+                gifGridContainer.innerHTML =
+                    '<div style="grid-column: span 3; font-size: 12px; color: #999;">No GIFs found.</div>';
                 return;
             }
 
@@ -224,12 +243,13 @@
                 const img = document.createElement('img');
                 img.src = gif.url;
                 img.style.cursor = 'pointer';
-                img.style.width = '100px';
+                img.style.width = '100%';
+                img.style.borderRadius = '4px';
 
                 img.addEventListener('click', () => {
                     previewImage.src = gif.url;
                     gifUrlInput.value = gif.url;
-                    previewContainer.style.style = 'block';
+                    previewContainer.style.display = 'block';
                     fileInput.value = "";
                     gifPopup.style.display = 'none';
                 });
@@ -241,7 +261,6 @@
             e.stopPropagation();
             gifPopup.style.display = gifPopup.style.display === 'none' ? 'block' : 'none';
             emojiPopup.style.display = 'none';
-
             if (gifPopup.style.display === 'block') {
                 renderLocalGIFs(gifSearchInput.value);
             }
@@ -266,11 +285,11 @@
             if (!emojiPopup.contains(e.target) && e.target !== emojiBtn) emojiPopup.style.display = 'none';
         });
 
-        // 🔖 LOGIKA AJAX UNTUK KIRIM DATA KE MVC BOOKMARK BARU (TANPA RELOAD)
+        // AJAX POST Bookmark
         document.querySelectorAll('.bookmark-btn').forEach(button => {
             button.addEventListener('click', async function(e) {
                 e.preventDefault();
-                e.stopPropagation(); // Menahan agar tidak trigger link a href detail post
+                e.stopPropagation();
 
                 const threadId = this.getAttribute('data-id');
                 const icon = this.querySelector('.bookmark-icon');
@@ -290,7 +309,7 @@
 
                     const data = await response.json();
                     if (data.success) {
-                        icon.innerText = "⭐"; // Menandakan postingan sukses tersimpan
+                        icon.innerText = "⭐";
                         alert(data.message);
                     } else {
                         alert(data.message);

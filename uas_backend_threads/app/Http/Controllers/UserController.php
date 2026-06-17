@@ -8,57 +8,27 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function create()
     {
-        return response()->json(User::all());
-    }
-
-    public function show($id)
-    {
-        return response()->json(User::findOrFail($id));
+        return view('users.create');
     }
 
     public function store(Request $request)
     {
-        $user = User::create([
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        User::create([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password)
         ]);
 
-        return response()->json([
-            'message' => 'User berhasil ditambahkan',
-            'data' => $user
-        ], 201);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email
-        ]);
-
-        if ($request->password) {
-            $user->update([
-                'password' => Hash::make($request->password)
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'User berhasil diupdate',
-            'data' => $user
-        ]);
-    }
-
-    public function destroy($id)
-    {
-        User::findOrFail($id)->delete();
-
-        return response()->json([
-            'message' => 'User berhasil dihapus'
-        ]);
+        return redirect()->route('threads.index')->with('success', 'User berhasil ditambahkan lewat sistem admin.');
     }
 }
