@@ -14,7 +14,7 @@ use App\Models\Reply;
 
 
 Route::get('/', function () {
-    if (\Illuminate\Support\Facades\Auth::check()) { // 👈 Menggunakan Facade Auth resmi
+    if (\Illuminate\Support\Facades\Auth::check()) {
         return redirect()->route('threads.index');
     }
     return redirect()->route('login');
@@ -41,7 +41,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
     Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
-    Route::put('/reply/update/{id}', [ReplyEditController::class, 'update']);
+    Route::put('/reply/update/{id}', [ReplyEditController::class, 'update'])->name('reply.update');
+    Route::delete('/reply/delete/{id}', [ReplyController::class, 'destroy'])->name('reply.destroy');
 
     Route::post('/follow/{id}', [RelationshipController::class, 'toggleFollow'])->name('follow.toggle');
     Route::get('/connections', [RelationshipController::class, 'index'])->name('connections');
@@ -51,11 +52,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
 
-    Route::get('/thread/demo', function () {
-        $replies = Reply::where('thread_id', 1)
-            ->whereNull('parent_reply_id')
-            ->with('childReplies')
-            ->get();
-        return view('replies.thread-detail', compact('replies'));
-    });
 });

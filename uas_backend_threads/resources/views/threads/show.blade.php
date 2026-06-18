@@ -45,18 +45,8 @@
         </div>
 
         <div style="margin-top: 30px;">
-            <h3>Replies</h3>
-            @if ($thread->replies && $thread->replies->count() > 0)
-                @foreach ($thread->replies as $reply)
-                    <div style="border-left: 2px solid #ccc; padding-left: 15px; margin-bottom: 15px;">
-                        <strong>{{ $reply->user->name }}</strong>
-                        <small style="color: #777;">@{{ $reply - > user - > username }}</small>
-                        <p style="margin: 5px 0;">{{ $reply->content }}</p>
-                    </div>
-                @endforeach
-            @else
-                <p style="color: #777; font-style: italic;">No replies yet.</p>
-            @endif
+            <h3>Komentar & Balasan</h3>
+            @include('replies.thread-detail', ['replies' => $thread->replies->where('parent_reply_id', null)])
         </div>
 
     </div>
