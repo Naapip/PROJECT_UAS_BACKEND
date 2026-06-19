@@ -11,15 +11,25 @@ class ReplyController extends Controller
     public function store(Request $request)
 {
     $request->validate([
-        'thread_id' => 'required|integer', 
+        'thread_id' => 'required|exists:threads,id',
+        'parent_reply_id' => 'nullable|exists:replies,id',
         'content' => 'required|string',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
+    $imagePath = null;
+
+    // Jika user mengunggah file gambar/GIF
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('replies', 'public');
+    }
+
     Reply::create([
-        'user_id' => auth()->id(),
         'thread_id' => $request->thread_id,
-        'parent_reply_id' => $request->parent_reply_id, 
+        'parent_reply_id' => $request->parent_reply_id,
+        'user_id' => auth()->id(),
         'content' => $request->content,
+        'image' => $imagePath,
     ]);
 
     return redirect()->route('threads.show', $request->thread_id)->with('success', 'Balasan berhasil dikirim!');
