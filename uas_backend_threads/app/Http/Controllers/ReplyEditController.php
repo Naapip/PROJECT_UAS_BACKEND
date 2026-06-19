@@ -8,33 +8,32 @@ use Carbon\Carbon;
 
 class ReplyEditController extends Controller
 {
-    // 1. Menampilkan halaman form edit
     public function edit($id)
     {
         $reply = Reply::findOrFail($id);
         return view('replies.reply-edit', compact('reply'));
     }
 
-    // 2. Memproses update data ke database MySQL
     public function update(Request $request, $id)
-    {
-        $request->validate([
-            'content' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'content' => 'required|string',
+    ]);
 
-        $reply = Reply::findOrFail($id);
+    $reply = Reply::findOrFail($id);
 
-        // LOGIKA UTAMA: Cek apakah waktu sekarang sudah lewat 5 menit dari waktu reply dibuat
-        $waktuPembuatan = Carbon::parse($reply->created_at);
-        if ($waktuPembuatan->diffInMinutes(Carbon::now()) > 5) {
-            return redirect()->back()->with('error', 'Gagal! Batas waktu edit (maksimal 5 menit) telah habis.');
-        }
+    $waktuPembuatan = \Carbon\Carbon::parse($reply->created_at);
+    $waktuSekarang = \Carbon\Carbon::now();
+    $selisihMenit = $waktuPembuatan->diffInMinutes($waktuSekarang, false);
 
-        // Jika lolos dari validasi 5 menit, update datanya
-        $reply->update([
-            'content' => $request->content
-        ]);
-
-        return redirect('/thread/demo')->with('success', 'Komentar berhasil diperbarui!');
+    if ($selisihMenit < 0 || $selisihMenit > 5) {
+        return redirect()->back()->with('error', 'Gagal! Batas waktu edit (maksimal 5 menit) telah habis.');
     }
+
+    $reply->update([
+        'content' => $request->content
+    ]);
+
+    return redirect()->route('threads.show', $reply->thread_id)->with('success', 'Komentar berhasil diperbarui!');
+}
 }

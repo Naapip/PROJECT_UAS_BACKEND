@@ -5,11 +5,15 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ReplyController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReplyEditController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Models\Reply;
+
+
 use App\Models\Reply;
 
 /*
@@ -20,7 +24,10 @@ use App\Models\Reply;
 
 // Halaman Utama (Bisa diakses siapa saja)
 Route::get('/', function () {
-    return view('welcome');
+    if (\Illuminate\Support\Facades\Auth::check()) {
+        return redirect()->route('threads.index');
+    }
+    return redirect()->route('login');
 });
 
 // =========================================================================
@@ -80,14 +87,24 @@ Route::middleware('auth')->group(function () {
 // Pencarian
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-// Melihat Daftar Kumpulan Thread
-Route::get('/threads', [ThreadController::class, 'index'])->name('threads.index');
+    Route::get('/threads', [ThreadController::class, 'index'])->name('threads.index');
+    Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
+    Route::get('/threads/{id}', [ThreadController::class, 'show'])->name('threads.show');
 
-// Demo Halaman Detail Thread & Balasan Berisi Relasi Parent-Child
-Route::get('/thread/demo', function () {
-    $replies = Reply::where('thread_id', 1)
-        ->whereNull('parent_reply_id')
-        ->with('childReplies')
-        ->get();
-    return view('replies.thread-detail', compact('replies'));
+    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+    Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
+
+    Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
+    Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
+    Route::put('/reply/update/{id}', [ReplyEditController::class, 'update'])->name('reply.update');
+    Route::delete('/reply/delete/{id}', [ReplyController::class, 'destroy'])->name('reply.destroy');
+
+    Route::post('/follow/{id}', [RelationshipController::class, 'toggleFollow'])->name('follow.toggle');
+    Route::get('/connections', [RelationshipController::class, 'index'])->name('connections');
+
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+
 });
