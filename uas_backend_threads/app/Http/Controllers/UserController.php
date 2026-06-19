@@ -4,61 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function index()
     {
-        return response()->json(User::all());
+        return view('updatethreads.index');
     }
 
-    public function show($id)
+    public function edit($id)
     {
-        return response()->json(User::findOrFail($id));
-    }
-
-    public function store(Request $request)
-    {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
-
-        return response()->json([
-            'message' => 'User berhasil ditambahkan',
-            'data' => $user
-        ], 201);
+        $user = User::findOrFail($id);
+        return view('updatethreads.edit', compact('user'));
     }
 
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
 
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email
+        $request->validate([
+            'name'     => 'required|string|max:50',
+            'email'    => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:6',
         ]);
 
-        if ($request->password) {
-            $user->update([
-                'password' => Hash::make($request->password)
-            ]);
+        $user->name  = $request->name;
+        $user->email = $request->email;
+
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
         }
 
-        return response()->json([
-            'message' => 'User berhasil diupdate',
-            'data' => $user
-        ]);
-    }
+        $user->save();
 
-    public function destroy($id)
-    {
-        User::findOrFail($id)->delete();
-
-        return response()->json([
-            'message' => 'User berhasil dihapus'
-        ]);
+        return redirect()->route('user-management', $user->id)
+                         ->with('success', 'Profil berhasil diperbarui.');
     }
 }
