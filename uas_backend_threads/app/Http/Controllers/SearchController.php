@@ -6,11 +6,16 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Thread; 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class SearchController extends Controller
 {
     public function index(Request $request)
+
     {
+        $request->validate($request->all(), [
+            'query' => 'nullable|string|max:100',
+        ]);
         $query = $request->input('query');
         $userResults = collect();
         $threadResults = collect();
@@ -21,7 +26,10 @@ class SearchController extends Controller
                                ->get();
 
             if (class_exists(\App\Models\Thread::class)) {
-                $threadResults = Thread::where('content', 'LIKE', "%{$query}%")->latest()->get();
+                $threadResults = Thread::where('content', 'LIKE', "%{$query}%")
+                ->withCount('replies')
+                ->latest()
+                ->get();
             }
 
         }
