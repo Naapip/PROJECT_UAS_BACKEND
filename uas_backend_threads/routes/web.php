@@ -5,15 +5,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ReplyController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReplyEditController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ActivityController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
-use App\Models\Reply;
-
-
 use App\Models\Reply;
 
 /*
@@ -22,23 +18,18 @@ use App\Models\Reply;
 |--------------------------------------------------------------------------
 */
 
-// Halaman Utama (Bisa diakses siapa saja)
+// Halaman Utama
 Route::get('/', function () {
-    if (\Illuminate\Support\Facades\Auth::check()) {
-        return redirect()->route('threads.index');
-    }
-    return redirect()->route('login');
+    return view('welcome');
 });
 
 // =========================================================================
 // 1. GUEST ROUTES (Hanya bisa diakses jika BELUM login)
 // =========================================================================
 Route::middleware('guest')->group(function () {
-    // Fitur Registrasi
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 
-    // Fitur Login
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 });
@@ -48,32 +39,26 @@ Route::middleware('guest')->group(function () {
 // =========================================================================
 Route::middleware('auth')->group(function () {
     
-    // Halaman User Management / Dashboard bawaan AuthController
     Route::get('/user-management', [AuthController::class, 'me'])->name('user-management');
-    
-    // Proses Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Fitur Threads (Membuat & Menyimpan Thread)
+    // Fitur Threads
     Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
 
-    // Fitur Reply (Membuat, Edit, Update Balasan)
+    // Fitur Reply
     Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
     Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
     Route::put('/reply/update/{id}', [ReplyEditController::class, 'update']);
 
-    // Fitur Follow / Hubungan Sosial
+    // Fitur Follow
     Route::post('/follow/{id}', [RelationshipController::class, 'toggleFollow'])->name('follow.toggle');
     Route::get('/connections', [RelationshipController::class, 'index'])->name('connections');
 
-    // Fitur Bookmark (Menyimpan & Melihat Bookmark)
+    // Fitur Bookmark
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
     Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
 
-    // Resource Route untuk User / Update Threads
-    Route::resource('updatethreads', UserController::class);
-
-    // API-style Routes untuk User Management
+    // API-style / CRUD User
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
     Route::post('/users', [UserController::class, 'store']);
@@ -82,29 +67,16 @@ Route::middleware('auth')->group(function () {
 });
 
 // =========================================================================
-// 3. PUBLIC / SHARED ROUTES (Bisa diakses Publik, atau sesuaikan kebutuhan)
+// 3. PUBLIC ROUTES (Bisa diakses tanpa login)
 // =========================================================================
-// Pencarian
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/threads', [ThreadController::class, 'index'])->name('threads.index');
 
-    Route::get('/threads', [ThreadController::class, 'index'])->name('threads.index');
-    Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
-    Route::get('/threads/{id}', [ThreadController::class, 'show'])->name('threads.show');
+Route::get('/thread/demo', function () {
+    $replies = Reply::where('thread_id', 1)
+        ->whereNull('parent_reply_id')
+        ->with('childReplies')
+        ->get();
 
-    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
-    Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
-
-    Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
-    Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
-    Route::put('/reply/update/{id}', [ReplyEditController::class, 'update'])->name('reply.update');
-    Route::delete('/reply/delete/{id}', [ReplyController::class, 'destroy'])->name('reply.destroy');
-
-    Route::post('/follow/{id}', [RelationshipController::class, 'toggleFollow'])->name('follow.toggle');
-    Route::get('/connections', [RelationshipController::class, 'index'])->name('connections');
-
-    Route::get('/search', [SearchController::class, 'index'])->name('search');
-
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
-
+    return view('replies.thread-detail', compact('replies'));
 });
