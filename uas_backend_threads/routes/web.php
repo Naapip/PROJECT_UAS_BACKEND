@@ -8,21 +8,10 @@ use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReplyEditController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\BookmarkController;
-use App\Http\Controllers\ActivityController;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
-use App\Models\Reply;
 
 
-use App\Models\Reply;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-// Halaman Utama (Bisa diakses siapa saja)
+// Pengalihan Halaman Utama
 Route::get('/', function () {
     if (\Illuminate\Support\Facades\Auth::check()) {
         return redirect()->route('threads.index');
@@ -30,81 +19,48 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// =========================================================================
-// 1. GUEST ROUTES (Hanya bisa diakses jika BELUM login)
-// =========================================================================
+// Rute Publik
+Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/threads', [ThreadController::class, 'index'])->name('threads.index');
+Route::get('/threads/{id}', [ThreadController::class, 'show'])->name('threads.show');
+
+// Rute Guest (Belum Login)
 Route::middleware('guest')->group(function () {
-    // Fitur Registrasi
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 
-    // Fitur Login
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 });
 
-// =========================================================================
-// 2. AUTH ROUTES (Hanya bisa diakses jika SUDAH login)
-// =========================================================================
+// Rute Terproteksi Auth (Sudah Login)
 Route::middleware('auth')->group(function () {
-    
-    // Halaman User Management / Dashboard bawaan AuthController
     Route::get('/user-management', [AuthController::class, 'me'])->name('user-management');
-    
-    // Proses Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Fitur Threads (Membuat & Menyimpan Thread)
+    // Modul Threads
     Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
 
-    // Fitur Reply (Membuat, Edit, Update Balasan)
-    Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
-    Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
-    Route::put('/reply/update/{id}', [ReplyEditController::class, 'update']);
-
-    // Fitur Follow / Hubungan Sosial
+    // Modul Hubungan Sosial
     Route::post('/follow/{id}', [RelationshipController::class, 'toggleFollow'])->name('follow.toggle');
     Route::get('/connections', [RelationshipController::class, 'index'])->name('connections');
 
-    // Fitur Bookmark (Menyimpan & Melihat Bookmark)
+    // Modul Bookmark
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
     Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
 
-    // Resource Route untuk User / Update Threads
-    Route::resource('updatethreads', UserController::class);
-
-    // API-style Routes untuk User Management
-    Route::get('/users', [UserController::class, 'index']);
-    Route::get('/users/{id}', [UserController::class, 'show']);
-    Route::post('/users', [UserController::class, 'store']);
-    Route::put('/users/{id}', [UserController::class, 'update']);
-    Route::delete('/users/{id}', [UserController::class, 'destroy']);
-});
-
-// =========================================================================
-// 3. PUBLIC / SHARED ROUTES (Bisa diakses Publik, atau sesuaikan kebutuhan)
-// =========================================================================
-// Pencarian
-Route::get('/search', [SearchController::class, 'index'])->name('search');
-
-    Route::get('/threads', [ThreadController::class, 'index'])->name('threads.index');
-    Route::post('/threads', [ThreadController::class, 'store'])->name('threads.store');
-    Route::get('/threads/{id}', [ThreadController::class, 'show'])->name('threads.show');
-
-    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
-    Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
-
+    // Modul Replies
     Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
     Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
     Route::put('/reply/update/{id}', [ReplyEditController::class, 'update'])->name('reply.update');
     Route::delete('/reply/delete/{id}', [ReplyController::class, 'destroy'])->name('reply.destroy');
 
-    Route::post('/follow/{id}', [RelationshipController::class, 'toggleFollow'])->name('follow.toggle');
-    Route::get('/connections', [RelationshipController::class, 'index'])->name('connections');
-
-    Route::get('/search', [SearchController::class, 'index'])->name('search');
-
+    // Modul User & Profile
+    Route::resource('updatethreads', UserController::class);
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
-
+    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });

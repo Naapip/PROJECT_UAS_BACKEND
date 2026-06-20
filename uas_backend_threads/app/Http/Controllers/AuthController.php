@@ -19,11 +19,6 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function showRegister()
-    {
-        return view('auth.register');
-    }
-
     public function register(Request $request)
     {
         $request->validate([
@@ -31,12 +26,6 @@ class AuthController extends Controller
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
         ]);
 
         $user = User::create([
@@ -49,14 +38,6 @@ class AuthController extends Controller
         Auth::login($user);
 
         return redirect()->route('threads.index');
-        Auth::login($user);
-
-        return redirect()->route('user-management');
-    }
-
-    public function showLogin()
-    {
-        return view('auth.login');
     }
 
     public function login(Request $request)
@@ -66,6 +47,7 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
+        // Fitur login fleksibel (bisa input email atau username)
         $fieldType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         $credentials = [
@@ -81,20 +63,6 @@ class AuthController extends Controller
         return back()->withErrors([
             'login' => 'Kredensial yang diberikan tidak cocok dengan data kami.',
         ])->withInput($request->only('login'));
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return back()->withErrors(['email' => 'Email atau password salah']);
-        }
-
-        Auth::login($user);
-
-        return redirect()->route('user-management');
     }
 
     public function me(Request $request)
@@ -110,4 +78,4 @@ class AuthController extends Controller
 
         return redirect()->route('login');
     }
-}
+} 
