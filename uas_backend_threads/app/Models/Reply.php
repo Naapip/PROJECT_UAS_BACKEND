@@ -22,4 +22,14 @@ class Reply extends Model
     {
         return $this->hasMany(Reply::class, 'parent_reply_id')->with('user', 'childReplies');
     }
+
+    public function likes()
+    {
+        return $this->hasMany(ReplyLike::class);
+    }
+
+    public function isLikedByAuthUser()
+    {
+        return $this->likes()->where('user_id', auth()->id())->exists();
+    }
 }

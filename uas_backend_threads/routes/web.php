@@ -6,6 +6,7 @@ use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReplyEditController;
+use App\Http\Controllers\ReplyLikeController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\UserController;
@@ -54,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
     Route::put('/reply/update/{id}', [ReplyEditController::class, 'update'])->name('reply.update');
     Route::delete('/reply/delete/{id}', [ReplyController::class, 'destroy'])->name('reply.destroy');
+    Route::post('/replies/{id}/like', [ReplyLikeController::class, 'toggleLike'])->name('replies.like');
 
     // Modul User & Profile
     Route::resource('updatethreads', UserController::class);
