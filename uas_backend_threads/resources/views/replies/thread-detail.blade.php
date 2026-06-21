@@ -8,6 +8,7 @@
     <p style="color: red; font-weight: bold;">{{ session('error') }}</p>
 @endif
 
+<!-- Form Input Post Utama -->
 <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; max-width: 600px; margin-bottom: 20px; background: #fff;">
     <form action="{{ route('reply.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -39,6 +40,7 @@
 
 <hr>
 
+<!-- List Looping Replies / Komentar -->
 <ul>
     @foreach($replies as $reply)
         <li style="margin-bottom: 25px; list-style: none; border-left: 2px solid #eee; padding-left: 10px;">
@@ -57,6 +59,14 @@
                 </div>
             @endif
             
+            <!-- Tombol Like Komentar Utama -->
+            <div style="margin: 5px 0; display: flex; align-items: center; gap: 8px;">
+                <button type="button" class="like-btn" data-id="{{ $reply->id }}" style="background: none; border: none; cursor: pointer; font-size: 14px; padding: 0; display: flex; align-items: center; gap: 4px;">
+                    <span class="heart-icon">{{ $reply->isLikedByAuthUser() ? '❤️' : '🤍' }}</span>
+                    <span class="like-count" style="font-size: 13px; color: #555;">{{ $reply->likes()->count() }}</span>
+                </button>
+            </div>
+
             <div style="margin-top: 5px;">
                 @if($reply->content !== '[Komentar ini telah dihapus]' && $reply->user_id === auth()->id())
                     <a href="{{ route('reply.edit', $reply->id) }}" style="font-size: 12px; color: blue; text-decoration: none; margin-right: 10px;">[Edit]</a>
@@ -107,12 +117,11 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. Emoji Mart
     const triggerButtons = document.querySelectorAll('.emoji-trigger-btn');
-
     triggerButtons.forEach(button => {
         const textareaId = button.getAttribute('data-target');
         const containerId = button.getAttribute('data-container');
-        
         const textarea = document.getElementById(textareaId);
         const container = document.getElementById(containerId);
 
@@ -125,19 +134,52 @@ document.addEventListener('DOMContentLoaded', function() {
                     textarea.focus();
                 }
             };
-
             const picker = new EmojiMart.Picker(pickerOptions);
             container.appendChild(picker);
 
             button.addEventListener('click', function(e) {
                 e.preventDefault();
-                if (container.style.display === 'none') {
-                    container.style.display = 'block';
-                } else {
-                    container.style.display = 'none';
-                }
+                container.style.display = container.style.display === 'none' ? 'block' : 'none';
             });
         }
+    });
+
+    // 2. AJAX Like Komentar (Event Delegation + Error Catching)
+    document.addEventListener('click', function(e) {
+        const button = e.target.closest('.like-btn');
+        if (!button) return;
+
+        e.preventDefault();
+        const replyId = button.getAttribute('data-id');
+        const heartIcon = button.querySelector('.heart-icon');
+        const likeCountSpan = button.querySelector('.like-count');
+
+        fetch(`/replies/${replyId}/like`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            // Jika rute salah (404) atau server error (500), akan langsung ketahuan di sini
+            if (!response.ok) {
+                console.error('Status Kode Eror:', response.status);
+                return response.text().then(text => { throw new Error(text) });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                heartIcon.textContent = data.liked ? '❤️' : '🤍';
+                likeCountSpan.textContent = data.likes_count;
+            }
+        })
+        .catch(error => {
+            console.error('Detail Eror Fetch:', error);
+            alert('Gagal menyukai komentar, cek inspect console kamu!');
+        });
     });
 });
 </script>
