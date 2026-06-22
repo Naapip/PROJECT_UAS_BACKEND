@@ -8,7 +8,9 @@ use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReplyEditController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\UserController;
+
 
 
 // Pengalihan Halaman Utama
@@ -48,6 +50,9 @@ Route::middleware('auth')->group(function () {
     // Modul Bookmark
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
     Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
+
+    // Modul Like
+    Route::post('/like/toggle', [LikeController::class, 'toggleLike'])->name('like.toggle');
 
     // Modul Replies
     Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
