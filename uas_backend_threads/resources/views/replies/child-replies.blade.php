@@ -16,6 +16,13 @@
                 </div>
             @endif
 
+            <div style="margin: 5px 0; display: flex; align-items: center; gap: 8px;">
+                <button type="button" class="like-btn" data-id="{{ $child->id }}" style="background: none; border: none; cursor: pointer; font-size: 13px; padding: 0; display: flex; align-items: center; gap: 4px;">
+                    <span class="heart-icon">{{ $child->isLikedByAuthUser() ? '❤️' : '🤍' }}</span>
+                    <span class="like-count" style="font-size: 12px; color: #555;">{{ $child->likes()->count() }}</span>
+                </button>
+            </div>
+
             <div>
                 @if($child->content !== '[Komentar ini telah dihapus]' && $child->user_id === auth()->id())
                     <a href="{{ route('reply.edit', $child->id) }}" style="font-size: 11px; color: blue; text-decoration: none; margin-right: 8px;">[Edit]</a>
@@ -35,7 +42,7 @@
                         <input type="hidden" name="thread_id" value="{{ $child->thread_id }}">
                         <input type="hidden" name="parent_reply_id" value="{{ $child->id }}">
                         
-                        <textarea id="reply-text-{{ $child->id }}" name="content" placeholder="Reply to this thread..." rows="2" required style="width: 100%; border: none; outline: none; resize: none; font-size: 12px; background: transparent PapayaWhip;"></textarea>
+                        <textarea id="reply-text-{{ $child->id }}" name="content" placeholder="Reply to this thread..." rows="2" required style="width: 100%; border: none; outline: none; resize: none; font-size: 12px; background: transparent;"></textarea>
                         <hr style="border: 0; border-top: 1px solid #ddd; margin: 6px 0;">
                         
                         <div style="display: flex; flex-direction: column; gap: 6px;">

@@ -25,11 +25,11 @@ class Reply extends Model
 
     public function likes()
     {
-    return $this->morphMany(\App\Models\Like::class, 'likeable');
+        return $this->hasMany(ReplyLike::class);
     }
 
-    public function isLikedByAuth()
+    public function isLikedByAuthUser()
     {
-    return $this->likes()->where('user_id', auth()->id())->exists();
+        return $this->likes()->where('user_id', auth()->id())->exists();
     }
 }
