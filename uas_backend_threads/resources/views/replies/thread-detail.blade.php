@@ -68,6 +68,19 @@
             </div>
 
             <div style="margin-top: 5px;">
+                <form action="{{ route('like.toggle') }}" method="POST" style="display:inline-block; margin-right: 10px;">
+                    @csrf
+                    <input type="hidden" name="likeable_id" value="{{ $reply->id }}">
+                    <input type="hidden" name="likeable_type" value="App\Models\Reply">
+                    
+                    <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 0;">
+                        @if($reply->isLikedByAuth())
+                            ❤️ <span style="color: red; font-weight: bold; font-size: 12px;">{{ $reply->likes()->count() }}</span>
+                        @else
+                            🤍 <span style="color: gray; font-size: 12px;">{{ $reply->likes()->count() }}</span>
+                        @endif
+                    </button>
+                </form>
                 @if($reply->content !== '[Komentar ini telah dihapus]' && $reply->user_id === auth()->id())
                     <a href="{{ route('reply.edit', $reply->id) }}" style="font-size: 12px; color: blue; text-decoration: none; margin-right: 10px;">[Edit]</a>
                     <form action="{{ route('reply.destroy', $reply->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus?')">

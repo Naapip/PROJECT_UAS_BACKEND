@@ -38,9 +38,23 @@
                                     <br><br>
                                     <strong>{{ $user->name }}</strong>
                                     <p>Email: {{ $user->email }}</p>
+
+                                    <p style="font-size: 0.9em; color: gray;">
+                                        👥 <b>{{ $user->followers()->count() }}</b> followers &nbsp;|&nbsp;
+                                        <b>{{ $user->following()->count() }}</b> following
+                                    </p>
+
                                     <form action="{{ route('follow.toggle', $user->id) }}" method="POST" style="display:inline">
                                         @csrf
-                                        <button type="submit">[Follow]</button>
+                                        @if($user->isFollowedByAuth())
+                                            <button type="submit" style="background-color: #ff4d4d; color:white; border: none; padding: 5px 10px; cursor:pointer;">
+                                                Unfollow
+                                            </button>
+                                        @else
+                                            <button type="submit" style="background-color: #4CAF50; color:white; border: none; padding: 5px 10px; cursor:pointer;">
+                                                Follow
+                                            </button>
+                                        @endif
                                     </form>
                                 </td>
                             </tr>
@@ -65,6 +79,10 @@
                                     <p>{{ $thread->content }}</p>
                                     
                                     <small>💬 {{ $thread->replies_count ?? 0 }} Balasan</small>
+                                    &nbsp;|&nbsp;
+                                    <a href="{{ route('threads.show', $thread->id) }}" style="text-decoration: none;">
+                                        <button type="button">Lihat Detail & Komentar</button>
+                                    </a>
                                 </td>
                             </tr>
                         </table>

@@ -42,6 +42,22 @@
             <div style="margin-top: 15px; color: #777; font-size: 12px;">
                 Posted on {{ $thread->created_at->format('d M Y, H:i') }}
             </div>
+
+            <div style="margin-top: 10px;">
+                <form action="{{ route('like.toggle') }}" method="POST" style="display:inline;">
+                    @csrf
+                    <input type="hidden" name="likeable_id" value="{{ $thread->id }}">
+                    <input type="hidden" name="likeable_type" value="App\Models\Thread">
+                    
+                    <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 1.2em; padding: 0;">
+                        @if($thread->isLikedByAuth())
+                            ❤️ <span style="color: red; font-weight: bold;">{{ $thread->likes()->count() }}</span>
+                        @else
+                            🤍 <span style="color: gray;">{{ $thread->likes()->count() }}</span>
+                        @endif
+                    </button>
+                </form>
+            </div>
         </div>
 
         <div style="margin-top: 30px;">
