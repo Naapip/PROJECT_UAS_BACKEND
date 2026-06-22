@@ -20,4 +20,19 @@ class Thread extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function replies()
+    {
+        return $this->hasMany(Reply::class);
+    }
+    
+    public function likes()
+    {
+    return $this->morphMany(\App\Models\Like::class, 'likeable');
+    }
+
+    public function isLikedByAuth()
+    {
+    return $this->likes()->where('user_id', auth()->id())->exists();
+    }
 }

@@ -9,7 +9,7 @@ class Reply extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'thread_id', 'parent_reply_id', 'content'];
+    protected $fillable = ['user_id', 'thread_id', 'parent_reply_id', 'content', 'image'];
 
     // Relasi ke User yang menulis balasan
     public function user()
@@ -21,5 +21,15 @@ class Reply extends Model
     public function childReplies()
     {
         return $this->hasMany(Reply::class, 'parent_reply_id')->with('user', 'childReplies');
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(ReplyLike::class);
+    }
+
+    public function isLikedByAuthUser()
+    {
+        return $this->likes()->where('user_id', auth()->id())->exists();
     }
 }

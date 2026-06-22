@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Bookmark extends Model
 {
-    protected $fillable = ['thread_id'];
+    protected $fillable = [
+        'user_id',
+        'thread_id',
+    ];
 
     public function thread()
     {

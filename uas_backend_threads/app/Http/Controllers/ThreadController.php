@@ -4,47 +4,43 @@ namespace App\Http\Controllers;
 
 use App\Models\Thread;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
 
 class ThreadController extends Controller
 {
     public function index()
     {
-        $threads = Thread::latest()->get();
+        $threads = \App\Models\Thread::with('user')->latest()->get();
+
         return view('threads.index', compact('threads'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'content' => 'required|string|max:500',
-            'community_or_topic' => 'nullable|string|max:100',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'gif_url' => 'nullable|url',
+            'content' => 'required|string',
+            'community_or_topic' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $imagePath = null;
-
         if ($request->hasFile('image')) {
-            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
-            $request->file('image')->move(public_path('uploads'), $imageName);
-            $imagePath = 'uploads/' . $imageName;
+            $file = $request->file('image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/threads'), $fileName);
+            $imagePath = 'uploads/threads/' . $fileName;
         } elseif ($request->filled('gif_url')) {
             $imagePath = $request->gif_url;
         }
 
-        Schema::disableForeignKeyConstraints();
-
-        Thread::create([
-            'user_id' => null,
+        \App\Models\Thread::create([
+            'user_id' => Auth::id(),
             'content' => $request->content,
             'community_or_topic' => $request->community_or_topic,
             'image_path' => $imagePath,
         ]);
 
-        Schema::enableForeignKeyConstraints();
-
-        return redirect()->back()->with('success', 'Thread berhasil diposting!');
+        return redirect()->route('threads.index')->with('success', 'Thread berhasil diposting!');
     }
 
     public function show($id)
