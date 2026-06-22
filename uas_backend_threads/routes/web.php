@@ -34,3 +34,9 @@ Route::get('/connections', [RelationshipController::class, 'index'])->name('conn
 
 Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
 Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
+
+Route::prefix('activities')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ActivityController::class, 'index']);
+    Route::post('/', [\App\Http\Controllers\ActivityController::class, 'store']);
+    Route::delete('/clear', [\App\Http\Controllers\ActivityController::class, 'clear']);
+});
