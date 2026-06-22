@@ -62,6 +62,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/reply/delete/{id}', [ReplyController::class, 'destroy'])->name('reply.destroy');
     Route::post('/replies/{id}/like', [ReplyLikeController::class, 'toggleLike'])->name('replies.like');
 
+Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
+
+Route::prefix('activities')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ActivityController::class, 'index']);
+    Route::post('/', [\App\Http\Controllers\ActivityController::class, 'store']);
+    Route::delete('/clear', [\App\Http\Controllers\ActivityController::class, 'clear']);
     // Modul User & Profile
     Route::resource('updatethreads', UserController::class);
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
