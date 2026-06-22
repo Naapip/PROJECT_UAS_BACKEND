@@ -13,7 +13,7 @@ class SearchController extends Controller
     public function index(Request $request)
 
     {
-        $request->validate([
+        $request->validate($request->all(), [
             'query' => 'nullable|string|max:100',
         ]);
         $query = $request->input('query');
@@ -26,11 +26,10 @@ class SearchController extends Controller
                                ->get();
 
             if (class_exists(\App\Models\Thread::class)) {
-            $threadResults = Thread::where('content', 'LIKE', "%{$query}%")
-                                ->with('user')     
-                                ->withCount('replies')
-                                ->latest()
-                                ->get();
+                $threadResults = Thread::where('content', 'LIKE', "%{$query}%")
+                ->withCount('replies')
+                ->latest()
+                ->get();
             }
 
         }

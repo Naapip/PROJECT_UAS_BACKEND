@@ -65,13 +65,6 @@
                                     <p>{{ $thread->content }}</p>
                                     
                                     <small>💬 {{ $thread->replies_count ?? 0 }} Balasan</small>
-                                    
-                                    <span style="margin-left: 15px;"></span>
-                                    <small>
-                                        <a href="{{ route('threads.show', $thread->id) }}" style="color: blue; text-decoration: none;">
-                                            Lihat Selengkapnya &rarr;
-                                        </a>
-                                    </small>
                                 </td>
                             </tr>
                         </table>
