@@ -15,9 +15,18 @@
             style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">
             <div>
                 <h1 style="margin: 0;">Threads</h1>
-                <button id="openModalBtn" style="margin-top: 10px;">
-                    + New Thread
-                </button>
+
+                <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
+                    <button id="openModalBtn">
+                        + New Thread
+                    </button>
+                    <a href="{{ route('search') }}">
+                        <button type="button" style="cursor: pointer;">🔍 Search Network</button>
+                    </a>
+                    <a href="/bookmarks">
+                        <button type="button" style="cursor: pointer;">🔖 Saved Bookmarks</button>
+                    </a>
+                </div>
             </div>
 
             <div style="text-align: right;">
