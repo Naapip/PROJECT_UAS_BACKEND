@@ -15,8 +15,8 @@ class ReplyLikeController extends Controller
 
         // Cek apakah user sudah pernah like komentar ini
         $existingLike = ReplyLike::where('reply_id', $reply->id)
-                                  ->where('user_id', $userId)
-                                  ->first();
+            ->where('user_id', $userId)
+            ->first();
 
         if ($existingLike) {
             // Jika sudah ada, hapus (Unlike)

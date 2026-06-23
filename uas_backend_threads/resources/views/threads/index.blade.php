@@ -11,6 +11,20 @@
 <body>
     <div style="max-width: 600px; margin: 0 auto; padding: 20px; position: relative;">
 
+        @if (session('success'))
+            <div
+                style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px;">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div
+                style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px;">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <div
             style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">
             <div>
@@ -21,10 +35,10 @@
                         + New Thread
                     </button>
                     <a href="{{ route('search') }}">
-                        <button type="button" style="cursor: pointer;">🔍 Search Network</button>
+                        <button type="button" style="cursor: pointer;"> Search Network</button>
                     </a>
                     <a href="/bookmarks">
-                        <button type="button" style="cursor: pointer;">🔖 Saved Bookmarks</button>
+                        <button type="button" style="cursor: pointer;"> Saved Bookmarks</button>
                     </a>
                 </div>
             </div>
@@ -42,13 +56,76 @@
 
         <div>
             @foreach ($threads as $thread)
-                <div style="padding: 16px 0; border-bottom: 1px solid #efefef;">
+                <div style="padding: 16px 0; border-bottom: 1px solid #efefef; position: relative;">
+
+                    <div style="position: absolute; top: 16px; right: 0; z-index: 999;">
+                        <button type="button" class="menu-dot-btn"
+                            style="background: none; border: none; font-size: 20px; cursor: pointer; color: #555; padding: 0 5px;">
+                            •••
+                        </button>
+
+                        <div class="menu-dropdown"
+                            style="display: none; position: absolute; right: 0; top: 25px; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 180px; padding: 5px 0; z-index: 1000;">
+
+                            <button type="button" class="bookmark-btn" data-id="{{ $thread->id }}"
+                                style="width: 100%; text-align: left; background: none; border: none; padding: 10px 14px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                <span class="bookmark-icon"></span> Save Bookmark
+                            </button>
+
+                            @if ($thread->user_id === Auth::id())
+                                <hr style="margin: 4px 0; border: 0; border-top: 1px solid #eee;">
+                                <button type="button" class="edit-thread-btn" data-id="{{ $thread->id }}"
+                                    data-content="{{ $thread->content }}" data-topic="{{ $thread->community_or_topic }}"
+                                    style="width: 100%; text-align: left; background: none; border: none; padding: 10px 14px; font-size: 13px; cursor: pointer; color: #007bff; display: flex; align-items: center; gap: 8px;">
+                                    Edit Post
+                                </button>
+
+                                <hr style="margin: 4px 0; border: 0; border-top: 1px solid #eee;">
+                                <form action="{{ route('threads.destroy', $thread->id) }}" method="POST"
+                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus thread ini?')"
+                                    style="margin: 0;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        style="width: 100%; text-align: left; background: none; border: none; padding: 10px 14px; font-size: 13px; cursor: pointer; color: red; display: flex; align-items: center; gap: 8px;">
+                                        Delete Post
+                                    </button>
+                                </form>
+                            @else
+                                <hr style="margin: 4px 0; border: 0; border-top: 1px solid #eee;">
+
+                                <button type="button" class="trigger-report-btn"
+                                    style="width: 100%; text-align: left; background: none; border: none; padding: 10px 14px; font-size: 13px; cursor: pointer; color: #cc8b00; display: flex; align-items: center; gap: 8px;">
+                                    Report Post
+                                </button>
+
+                                <div class="report-form-wrapper" style="display: none; padding: 5px 14px 10px 14px;">
+                                    <form action="{{ route('reports.store') }}" method="POST"
+                                        style="margin: 0; display: flex; flex-direction: column; gap: 6px;">
+                                        @csrf
+                                        <input type="hidden" name="thread_id" value="{{ $thread->id }}">
+                                        <select name="reason" required
+                                            style="width: 100%; font-size: 12px; padding: 4px; border: 1px solid #ccc; border-radius: 4px;">
+                                            <option value="" disabled selected>Pilih Alasan...</option>
+                                            <option value="Spam atau Iklan">Spam / Iklan</option>
+                                            <option value="Ujaran Kebencian">Hate Speech</option>
+                                            <option value="Konten Tidak Layak">Inappropriate</option>
+                                        </select>
+                                        <button type="submit"
+                                            style="width: 100%; font-size: 12px; background: #f0ad4e; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                            Kirimin Laporan
+                                        </button>
+                                    </form>
+                                </div>
+                            @endif
+
+                        </div>
+                    </div>
 
                     <a href="{{ route('threads.show', $thread->id) }}"
-                        style="text-decoration: none; color: inherit; display: block;">
+                        style="text-decoration: none; color: inherit; display: block; padding-right: 40px;">
                         <div>
                             <strong>{{ $thread->user->name }}</strong>
-                            <span style="color: #777;"></span>
                             @if ($thread->community_or_topic)
                                 <span>•</span>
                                 <span style="color: blue;">{{ $thread->community_or_topic }}</span>
@@ -65,13 +142,6 @@
                             </div>
                         @endif
                     </a>
-
-                    <div style="margin-top: 10px;">
-                        <button type="button" class="bookmark-btn" data-id="{{ $thread->id }}"
-                            style="cursor: pointer;">
-                            <span class="bookmark-icon">🔖</span> Save to Bookmark
-                        </button>
-                    </div>
 
                 </div>
             @endforeach
@@ -106,8 +176,8 @@
                                 style="position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; cursor: pointer;">✕</button>
                         </div>
 
-                        <input type="file" id="fileInput" name="image" accept="image/*" onchange="previewFile()"
-                            style="display: none;">
+                        <input type="file" id="fileInput" name="image" accept="image/*"
+                            onchange="previewFile()" style="display: none;">
 
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
                             <button type="button" onclick="document.getElementById('fileInput').click()"
@@ -139,6 +209,38 @@
         </div>
     </div>
 
+    <div id="editThreadModal"
+        style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center;">
+        <div
+            style="background-color: #ffffff; color: #000000; padding: 20px; width: 100%; max-width: 500px; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <button type="button" id="closeEditModalBtn">Cancel</button>
+                <h2 style="margin: 0;">Edit Thread</h2>
+                <div style="color: #999;">✏️</div>
+            </div>
+
+            <form id="editThreadForm" action="" method="POST">
+                @csrf
+                @method('PUT')
+                <div style="display: flex; gap: 12px; margin-bottom: 15px;">
+                    <div style="font-size: 24px;">👤</div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                        <input type="text" id="editCommunityOrTopic" name="community_or_topic"
+                            placeholder="Community or topic (optional)" style="width: 100%; padding: 6px;">
+                        <textarea id="editThreadContent" name="content" rows="4" placeholder="Update content..." required
+                            style="width: 100%; padding: 6px; resize: none; font-family: inherit;"></textarea>
+                    </div>
+                </div>
+
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 15px;">
+                    <span style="color: #999; font-size: 13px;">Editing post mode</span>
+                    <button type="submit">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         const modal = document.getElementById('threadModal');
         const openBtn = document.getElementById('openModalBtn');
@@ -159,6 +261,12 @@
         const emojiPopup = document.getElementById('emojiPopup');
         const picker = document.querySelector('emoji-picker');
 
+        const editModal = document.getElementById('editThreadModal');
+        const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+        const editThreadForm = document.getElementById('editThreadForm');
+        const editCommunityOrTopic = document.getElementById('editCommunityOrTopic');
+        const editThreadContent = document.getElementById('editThreadContent');
+
         const localGifs = [{
                 name: "cat laugh meme lucu kucing ketawa ngakak",
                 url: "https://media4.giphy.com/media/tJqyalvo9ahykfykAj/200.gif"
@@ -166,10 +274,6 @@
             {
                 name: "shocked wow kaget nani terkejut blink",
                 url: "https://media3.giphy.com/media/l3q2zVr6cu95nF6O4/200.gif"
-            },
-            {
-                name: "naruto run anime ninja running lari",
-                url: "https://media4.giphy.com/media/cuPm4A492Th6g/200.gif"
             },
             {
                 name: "homer simpson hide back sembunyi",
@@ -180,22 +284,6 @@
                 url: "https://media1.giphy.com/media/3NtY188QaxDdC/200.gif"
             },
             {
-                name: "dance happy joget minion senang pesta",
-                url: "https://media1.giphy.com/media/G9q3dT7SUJWNy/200.gif"
-            },
-            {
-                name: "crying sad sedih nangis kecewa sedih",
-                url: "https://media0.giphy.com/media/oGO1MPAbVfU9W/200.gif"
-            },
-            {
-                name: "stare monkey bingung heran lirik melirik",
-                url: "https://media0.giphy.com/media/ee3fPvws76Nva/200.gif"
-            },
-            {
-                name: "spiderman point menunjuk kembar twins",
-                url: "https://media4.giphy.com/media/l36kU8mSVKDFKdVpm/200.gif"
-            },
-            {
                 name: "mind blown meledak kaget gila wow",
                 url: "https://media1.giphy.com/media/26ufdipQqU2lhNA4g/200.gif"
             },
@@ -203,10 +291,6 @@
                 name: "dog fine fire aman santai santuy",
                 url: "https://media3.giphy.com/media/QMHoU66sBXqqLqYvGO/200.gif"
             },
-            {
-                name: "clapping tepuk tangan bravo mantap",
-                url: "https://media1.giphy.com/media/l3q2XhfQ8oCkm1K76/200.gif"
-            }
         ];
 
         openBtn.addEventListener('click', () => modal.style.display = 'flex');
@@ -289,12 +373,75 @@
             threadContent.value += event.detail.unicode;
         });
 
+        document.querySelectorAll('.menu-dot-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const currentDropdown = btn.nextElementSibling;
+                document.querySelectorAll('.menu-dropdown').forEach(dd => {
+                    if (dd !== currentDropdown) dd.style.display = 'none';
+                });
+
+                currentDropdown.style.display = currentDropdown.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+
+        document.querySelectorAll('.trigger-report-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const formWrapper = btn.nextElementSibling;
+                if (formWrapper.style.display === 'none') {
+                    formWrapper.style.display = 'block';
+                    btn.style.fontWeight = 'bold';
+                } else {
+                    formWrapper.style.display = 'none';
+                    btn.style.fontWeight = 'normal';
+                }
+            });
+        });
+
+        document.querySelectorAll('.edit-thread-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const id = btn.getAttribute('data-id');
+                const content = btn.getAttribute('data-content');
+                const topic = btn.getAttribute('data-topic');
+
+                editThreadContent.value = content;
+                editCommunityOrTopic.value = topic;
+                editThreadForm.action = `/threads/${id}`;
+
+                btn.closest('.menu-dropdown').style.display = 'none';
+                editModal.style.display = 'flex';
+            });
+        });
+
+        closeEditModalBtn.addEventListener('click', () => {
+            editModal.style.display = 'none';
+        });
+
+
         document.addEventListener('click', (e) => {
             if (!gifPopup.contains(e.target) && e.target !== gifBtn) gifPopup.style.display = 'none';
             if (!emojiPopup.contains(e.target) && e.target !== emojiBtn) emojiPopup.style.display = 'none';
+            if (e.target === editModal) editModal.style.display = 'none';
+
+            if (!e.target.classList.contains('menu-dot-btn') && !e.target.closest('.menu-dropdown')) {
+                document.querySelectorAll('.menu-dropdown').forEach(dd => {
+                    dd.style.display = 'none';
+                    const formWrapper = dd.querySelector('.report-form-wrapper');
+                    const triggerBtn = dd.querySelector('.trigger-report-btn');
+                    if (formWrapper) formWrapper.style.display = 'none';
+                    if (triggerBtn) triggerBtn.style.fontWeight = 'normal';
+                });
+            }
         });
 
-        // AJAX POST Bookmark
         document.querySelectorAll('.bookmark-btn').forEach(button => {
             button.addEventListener('click', async function(e) {
                 e.preventDefault();
