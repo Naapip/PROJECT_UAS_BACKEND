@@ -98,15 +98,36 @@
                 </button>
             </div>
 
+            <!-- Form Reply Untuk Komentar Utama (Kembali Ditambahkan Fitur Upload Media & Emote) -->
             <details style="margin-top: 8px;">
                 <summary style="font-size: 12px; color: #555; cursor: pointer; max-width: max-content;">💬 Reply</summary>
                 <div style="border: 1px solid #ddd; padding: 10px; border-radius: 6px; max-width: 500px; margin-top: 5px; background: #fafafa;">
-                    <form action="{{ route('reply.store') }}" method="POST">
+                    <form action="{{ route('reply.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="thread_id" value="{{ $thread->id }}">
                         <input type="hidden" name="parent_reply_id" value="{{ $reply->id }}">
+                        
                         <textarea id="reply-text-{{ $reply->id }}" name="content" placeholder="Reply to this comment..." rows="2" required style="width: 100%; border: none; outline: none; resize: none; font-size: 13px; background: transparent;"></textarea>
-                        <button type="submit" style="background: #333; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; margin-top: 5px;">Reply</button>
+                        <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
+
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; gap: 5px;">
+                                    <label style="cursor: pointer; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-size: 11px; background: #fff;">
+                                        🖼️ Photo/GIF
+                                        <input type="file" name="image" accept="image/*" style="display: none;">
+                                    </label>
+                                    <button type="button" class="emoji-trigger-btn"
+                                        data-target="reply-text-{{ $reply->id }}"
+                                        data-container="emoji-picker-{{ $reply->id }}"
+                                        style="cursor: pointer; border: 1px solid #ccc; padding: 2px 6px; border-radius: 4px; font-size: 11px; background: #fff;">
+                                        😊 Emote
+                                    </button>
+                                </div>
+                                <button type="submit" style="background: #333; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">Reply</button>
+                            </div>
+                            <div id="emoji-picker-{{ $reply->id }}" style="display: none; margin-top: 5px; max-width: 100%;"></div>
+                        </div>
                     </form>
                 </div>
             </details>
