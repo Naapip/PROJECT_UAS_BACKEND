@@ -11,8 +11,7 @@ use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\UserController;
-
-
+use App\Http\Controllers\ActivityController;
 
 // Pengalihan Halaman Utama
 Route::get('/', function () {
@@ -52,29 +51,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
     Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
 
-    // Modul Like
+    // Modul Like (Bawaan Tim)
     Route::post('/like/toggle', [LikeController::class, 'toggleLike'])->name('like.toggle');
 
-    // Modul Replies
+    // Modul Replies (Fitur Kamu)
     Route::post('/reply', [ReplyController::class, 'store'])->name('reply.store');
     Route::get('/reply/edit/{id}', [ReplyEditController::class, 'edit'])->name('reply.edit');
     Route::put('/reply/update/{id}', [ReplyEditController::class, 'update'])->name('reply.update');
     Route::delete('/reply/delete/{id}', [ReplyController::class, 'destroy'])->name('reply.destroy');
     Route::post('/replies/{id}/like', [ReplyLikeController::class, 'toggleLike'])->name('replies.like');
 
-Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
-Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
+    // Modul Aktivitas Tim
+    Route::prefix('activities')->group(function () {
+        Route::get('/', [ActivityController::class, 'index']);
+        Route::post('/', [ActivityController::class, 'store']);
+        Route::delete('/clear', [ActivityController::class, 'clear']);
+    });
 
-Route::prefix('activities')->group(function () {
-    Route::get('/', [\App\Http\Controllers\ActivityController::class, 'index']);
-    Route::post('/', [\App\Http\Controllers\ActivityController::class, 'store']);
-    Route::delete('/clear', [\App\Http\Controllers\ActivityController::class, 'clear']);
-    // Modul User & Profile
+    // Modul User & Profile (CRUD Lengkap)
     Route::resource('updatethreads', UserController::class);
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
     Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });
