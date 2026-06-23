@@ -60,7 +60,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/reply/update/{id}', [ReplyEditController::class, 'update'])->name('reply.update');
     Route::delete('/reply/delete/{id}', [ReplyController::class, 'destroy'])->name('reply.destroy');
     Route::post('/replies/{id}/like', [ReplyLikeController::class, 'toggleLike'])->name('replies.like');
-}); // <-- DI SINI KAMU LUPA MENUTUP BLOK ROUTE::MIDDLEWARE('AUTH')
 
     // Modul Aktivitas Tim
     Route::prefix('activities')->group(function () {
