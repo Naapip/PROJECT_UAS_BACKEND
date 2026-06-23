@@ -17,7 +17,6 @@
         </div>
 
         <h2>Search User & Thread</h2>
-
         <form action="{{ route('search') }}" method="GET">
             <input type="text" name="query" placeholder="Search users or content..." value="{{ request('query') }}"
                 style="width: 75%; padding: 6px;">
