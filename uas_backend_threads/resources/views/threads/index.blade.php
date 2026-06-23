@@ -43,6 +43,9 @@
                     <a href="{{ route('messages.index') }}">
                         <button type="button" style="cursor: pointer;">Direct Messages</button>
                     </a>
+                    <a href="{{ route('profile.index') }}">
+                        <button type="button" style="cursor: pointer;">My Profile</button>
+                    </a>
                 </div>
             </div>
 
