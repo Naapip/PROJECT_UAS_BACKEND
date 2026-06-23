@@ -48,4 +48,42 @@ class ThreadController extends Controller
         $thread = Thread::findOrFail($id);
         return view('threads.show', compact('thread'));
     }
+    function destroy($id)
+    {
+        $thread = Thread::findOrFail($id);
+        if ($thread->user_id !== Auth::id()) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk menghapus thread ini.');
+        }
+
+        if ($thread->image_path && !str_starts_with($thread->image_path, 'http')) {
+            $fullPath = public_path($thread->image_path);
+            if (file_exists($fullPath)) {
+                @unlink($fullPath);
+            }
+        }
+
+        $thread->delete();
+
+        return redirect()->route('threads.index')->with('success', 'Thread berhasil dihapus!');
+    }
+    public function update(Request $request, $id)
+    {
+        $thread = Thread::findOrFail($id);
+
+        if ($thread->user_id !== Auth::id()) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mengedit thread ini.');
+        }
+
+        $request->validate([
+            'content' => 'required|string',
+            'community_or_topic' => 'nullable|string',
+        ]);
+
+        $thread->update([
+            'content' => $request->content,
+            'community_or_topic' => $request->community_or_topic,
+        ]);
+
+        return redirect()->route('threads.index')->with('success', 'Thread berhasil diperbarui!');
+    }
 }
