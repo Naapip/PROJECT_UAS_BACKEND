@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Thread; 
+use App\Models\Thread;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class SearchController extends Controller
 {
@@ -22,19 +21,18 @@ class SearchController extends Controller
 
         if (!empty($query)) {
             $userResults = User::where('name', 'LIKE', "%{$query}%")
-                               ->where('id', '!=', Auth::id()) 
-                               ->get();
+                ->where('id', '!=', Auth::id())
+                ->get();
 
             if (class_exists(\App\Models\Thread::class)) {
-            $threadResults = Thread::where('content', 'LIKE', "%{$query}%")
-                                   ->with('user')
-                                   ->withCount('replies')
-                                   ->latest()
-                                   ->get();
+                $threadResults = Thread::where('content', 'LIKE', "%{$query}%")
+                    ->with('user')
+                    ->withCount('replies')
+                    ->latest()
+                    ->get();
             }
-
         }
 
-        return view('search-results', compact('userResults', 'threadResults', 'query'));
+        return view('search.search-results', compact('userResults', 'threadResults', 'query'));
     }
 }
