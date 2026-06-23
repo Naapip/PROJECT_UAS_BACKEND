@@ -89,3 +89,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages/{userId}', [\App\Http\Controllers\MessageController::class, 'show'])->name('messages.show');
     Route::post('/messages/{userId}', [\App\Http\Controllers\MessageController::class, 'store'])->name('messages.store');
 });
+
+Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');
+Route::put('/profile/update', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');

@@ -21,8 +21,7 @@
             @foreach ($followers as $follower)
                 <div style="border: 1px solid #ccc; padding: 12px; margin-bottom: 10px; border-radius: 4px;">
                     <p style="margin: 0 0 5px 0;"><strong>{{ $follower->name }}</strong> <span
-                            style="color: #555;">(@{{ $follower - > username }})</span></p>
-                    <small style="color: #777;">{{ $follower->email }}</small>
+                            style="color: #555;"></span></p>
                 </div>
             @endforeach
         @endif
@@ -37,9 +36,8 @@
                 <div
                     style="border: 1px solid #ccc; padding: 12px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <strong>{{ $follow->name }}</strong> <span style="color: #555;">(@{{ $follow - > username }})</span>
+                        <strong>{{ $follow->name }}</strong> <span style="color: #555;"></span>
                         <br>
-                        <small style="color: #777;">{{ $follow->email }}</small>
                     </div>
 
                     <form action="{{ route('follow.toggle', $follow->id) }}" method="POST" style="display:inline">
