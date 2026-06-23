@@ -83,3 +83,9 @@ Route::middleware('auth')->group(function () {
 Route::delete('/threads/{id}', [\App\Http\Controllers\ThreadController::class, 'destroy'])->name('threads.destroy');
 Route::post('/reports', [\App\Http\Controllers\ReportController::class, 'store'])->name('reports.store');
 Route::put('/threads/{id}', [\App\Http\Controllers\ThreadController::class, 'update'])->name('threads.update');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{userId}', [\App\Http\Controllers\MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{userId}', [\App\Http\Controllers\MessageController::class, 'store'])->name('messages.store');
+});

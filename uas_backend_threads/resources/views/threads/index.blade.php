@@ -28,7 +28,7 @@
         <div
             style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">
             <div>
-                <h1 style="margin: 0;">Threads</h1>
+                <h1 style="margin: 0;">@threads</h1>
 
                 <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
                     <button id="openModalBtn">
@@ -39,6 +39,9 @@
                     </a>
                     <a href="/bookmarks">
                         <button type="button" style="cursor: pointer;"> Saved Bookmarks</button>
+                    </a>
+                    <a href="{{ route('messages.index') }}">
+                        <button type="button" style="cursor: pointer;">Direct Messages</button>
                     </a>
                 </div>
             </div>
