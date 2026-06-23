@@ -24,7 +24,10 @@
                     <small style="color: #555;"></small>
 
                     @if ($thread->community_or_topic)
-                        <p style="margin: 5px 0 0 0; font-size: 14px; color: blue;">#{{ $thread->community_or_topic }}
+                        <p style="margin: 5px 0 0 0; font-size: 14px;">
+                            <a href="{{ route('search') }}?query=%23{{ $thread->community_or_topic }}" style="color: blue; text-decoration: none; font-weight: bold;">
+                                #{{ $thread->community_or_topic }}
+                            </a>
                         </p>
                     @endif
                 </div>

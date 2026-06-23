@@ -25,7 +25,10 @@ class SearchController extends Controller
                 ->get();
 
             if (class_exists(\App\Models\Thread::class)) {
+                $cleanQuery = ltrim($query, '#');
+
                 $threadResults = Thread::where('content', 'LIKE', "%{$query}%")
+                    ->orWhere('community_or_topic', 'LIKE', "%{$cleanQuery}%") 
                     ->with('user')
                     ->withCount('replies')
                     ->latest()

@@ -84,6 +84,14 @@
                     <strong>{{ $thread->user->name ?? 'Anonymous' }}</strong> <span style="color: #777;"></span>
                     <p style="margin: 10px 0; line-height: 1.4;">{{ $thread->content }}</p>
 
+                    @if (!empty($thread->community_or_topic))
+                        <p style="margin: 5px 0 10px 0; font-size: 14px;">
+                            <a href="{{ route('search') }}?query=%23{{ $thread->community_or_topic }}" style="color: blue; text-decoration: none; font-weight: bold;">
+                                #{{ $thread->community_or_topic }}
+                            </a>
+                        </p>
+                    @endif
+
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                         <small style="color: #555;">💬 {{ $thread->replies_count ?? $thread->replies()->count() }}
                             Balasan</small>
