@@ -33,9 +33,10 @@ class RelationshipController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $followers = User->whereIn('id', Follow::where('follower_id', $User->id)->pluck('follower_id'))->get(); //mengambil daftar user yang mengikuti user(kamu/anda)
-        $following = User->whereIn('id', Follow::where('following_id', $User->id)->pluck('following_id'))->get(); //mengambil daftar user yang user(kamu/anda) ikuti
+        
+        $followers = User::whereIn('id', Follow::where('following_id', $user->id)->pluck('follower_id'))->get(); 
+        $following = User::whereIn('id', Follow::where('follower_id', $user->id)->pluck('following_id'))->get(); 
 
-        return view('connections', compact('followers', 'following'));
+        return view('search.connections', compact('followers', 'following'));
     }
 }
